@@ -56,6 +56,7 @@ typedef struct __attribute((__packed__)) {
   int32_t gps_longitude = 0;
   int32_t gps_altitude_cm = 0;
   uint32_t gps_us = 0; 
+  uint32_t cnt = 0; 
   CMMC_PACKET_T packet;
   uint32_t sum;
   uint8_t tail[2] = {0x0d, 0x0a};

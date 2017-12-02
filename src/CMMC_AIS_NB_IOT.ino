@@ -21,15 +21,14 @@ static void doSomeWork( const gps_fix & fix )
     gps_latitude = fix.latitudeL();
     gps_longitude = fix.longitudeL();
     gps_altitude_cm = fix.altitude_cm();
-    gps_us =  fix.dateTime_us();
-  } 
+    gps_us = fix.dateTime_us();
+  }
 } // doSomeWork
 static void GPSloop();
 static void GPSloop()
 {
   while (gps.available( gpsPort ))
     doSomeWork( gps.read() );
-
 } // GPSloop
 
 String serverIP = "103.212.181.167";
@@ -52,43 +51,34 @@ void array_to_string(byte array[], unsigned int len, char buffer[])
   }
   buffer[len * 2] = '\0';
 }
-long cnt = 0;
 CMMC_RX_Parser parser(&Serial3);
 
 bool flag_dirty = false;
 char bbb[400];
-void dump(const u8* data, size_t size) {
-  array_to_string((byte*)data, size, bbb);
-  // array_to_string((byte*)packet, len+4, buffer);
-  // Serial.println(bbb);
-  // for (size_t i = 0; i < size; i++) {
-  //   Serial.print(data[i], HEX);
-  // }
-}
 
 static CMMC_MASTER_PACKET_T master_packet;
 
-static void msg_recv(u8 * packet, u8 len) { 
-    Serial.println("RECV PACKET..");
-    Serial.println();
-    Serial.print(F("packet size= "));
-    Serial.println(len);
+static void msg_recv(u8 * packet, u8 len) {
+  Serial.println("RECV PACKET..");
+  Serial.println();
+  Serial.print(F("packet size= "));
+  Serial.println(len);
 
-    Serial.println("MASTER_PACKET..");
-    Serial.print("master_packet size= ");
-    Serial.println(sizeof(master_packet));
-    if (len == sizeof(master_packet.packet)) { 
-      memcpy(&(master_packet.packet), packet, len);
+  Serial.println("MASTER_PACKET..");
+  Serial.print("master_packet size= ");
+  Serial.println(sizeof(master_packet));
+  if (len == sizeof(master_packet.packet)) {
+    memcpy(&(master_packet.packet), packet, len);
 
-      Serial.println(String("project = ") + master_packet.packet.project);
-      Serial.println(String("version = ") + master_packet.packet.version);
-      Serial.println(String("field1 = ")  + master_packet.packet.data.field1);
-      Serial.println(String("field2 = ")  + master_packet.packet.data.field2);
-      Serial.println(String("battery = ") + master_packet.packet.data.battery);
-      Serial.println(String("myName= ") + master_packet.packet.data.myName);
+    Serial.println(String("project = ") + master_packet.packet.project);
+    Serial.println(String("version = ") + master_packet.packet.version);
+    Serial.println(String("field1 = ")  + master_packet.packet.data.field1);
+    Serial.println(String("field2 = ")  + master_packet.packet.data.field2);
+    Serial.println(String("battery = ") + master_packet.packet.data.battery);
+    Serial.println(String("myName= ") + master_packet.packet.data.myName);
 
-      flag_dirty = true;
-    }
+    flag_dirty = true;
+  }
 }
 
 void setup()
@@ -100,12 +90,12 @@ void setup()
   Serial.println("BEGIN...");
 #ifdef ENABLE_AIS_NB_IOT
   delay(5000); // wait nb-iot module boot
-  AISnb.debug = true;
+  // AISnb.debug = true;
   AISnb.setupDevice(serverPort);
   String ip1 = AISnb.getDeviceIP();
   Serial.println("Connected...");
   pingRESP pingR = AISnb.pingIP(serverIP);
-#endif 
+#endif
   parser.on_command_arrived(&msg_recv);
 }
 String hexString;
@@ -113,36 +103,39 @@ signal  sig;
 void loop()
 {
   parser.process();
-  GPSloop(); 
+  GPSloop();
   if (flag_dirty) {
 
-    #ifdef ENABLE_AIS_NB_IOT 
-      sig = AISnb.getSignal();
-      master_packet.nb_ber = sig.ber.toInt();
-      master_packet.nb_rssi = sig.rssi.toInt();
-      master_packet.nb_csq = sig.csq.toInt();
-    #endif
+#ifdef ENABLE_AIS_NB_IOT
+    sig = AISnb.getSignal();
+    master_packet.nb_ber = sig.ber.toInt();
+    master_packet.nb_rssi = sig.rssi.toInt();
+    master_packet.nb_csq = sig.csq.toInt();
+#endif
 
     master_packet.gps_altitude_cm = gps_altitude_cm;
     master_packet.gps_latitude = gps_latitude;
     master_packet.gps_longitude = gps_longitude;
     master_packet.gps_us = gps_us;
+    master_packet.cnt++;
     array_to_string((byte*)&master_packet, sizeof(master_packet), bbb);
-    #ifdef ENABLE_AIS_NB_IOT 
+#ifdef ENABLE_AIS_NB_IOT
     UDPSend res = AISnb.sendUDPmsg(serverIP, serverPort, String(bbb));
     if (res.status) {
-      Serial.println("SEND OK"); 
+      Serial.println("SEND OK");
     }
     else {
       Serial.println("SEND FAILED.");
     }
-    #endif
+#endif
     flag_dirty = false;
   }
-  interval.every_ms(5L * 1000, []() { });
-  #ifdef ENABLE_AIS_NB_IOT
-  //  UDPReceive resp = AISnb.waitResponse();
-  #endif
+
+  interval.every_ms(5L * 1000, []() {
+
+
+  });
+
 
 }
 
