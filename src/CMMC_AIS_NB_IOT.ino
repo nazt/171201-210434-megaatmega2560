@@ -29,13 +29,16 @@ CMMC_RX_Parser parser(&Serial3);
 
 bool flag_dirty = false;
 char bbb[256];
-CMMC_PACKET_T cmmc_packet;
 void dump(const u8* data, size_t size) {
-  for (size_t i = 0; i < size; i++) {
-    Serial.print(data[i], HEX);
-  }
+  array_to_string((byte*)data, size, bbb);
+  Serial.println(bbb);
+
+  // for (size_t i = 0; i < size; i++) {
+  //   Serial.print(data[i], HEX);
+  // }
 }
 
+CMMC_PACKET_T cmmc_packet;
 
 void setup()
 {
@@ -43,21 +46,26 @@ void setup()
   Serial.begin(57600);
   Serial3.begin(57600);
   Serial.println("BEGIN...");
+  #ifdef ENABLE_AIS_NB_IOT
   AISnb.setupDevice(serverPort);
   String ip1 = AISnb.getDeviceIP();
   pingRESP pingR = AISnb.pingIP(serverIP);
+  #endif
 
   parser.on_command_arrived([](u8* packet, u8 len) {
+    dump(packet, len); 
     memcpy((uint8_t*)&cmmc_packet, packet, len);
     Serial.println(String("project = ") + cmmc_packet.project);
     Serial.println(String("version = ") + cmmc_packet.version);
     Serial.println(String("field1 = ") + cmmc_packet.data.field1);
     Serial.println(String("field2 = ") + cmmc_packet.data.field2);
     Serial.println(String("battery = ") + cmmc_packet.data.battery); 
-    // Serial.print("cmmc_packet size= ");
-    // Serial.println(sizeof(cmmc_packet));
-    // dump((uint8_t*)&cmmc_packet, len); 
-    array_to_string((byte*)packet, len+4, bbb);
+
+    Serial.println();
+    Serial.print("cmmc_packet size= ");
+    Serial.println(sizeof(cmmc_packet));
+    dump((uint8_t*)&cmmc_packet, sizeof(cmmc_packet)); 
+    // array_to_string((byte*)packet, len+4, bbb);
     flag_dirty = true;
   });
 }
@@ -65,10 +73,12 @@ void loop()
 {
   parser.process();
   if (flag_dirty) {
-    signal sig = AISnb.getSignal();
     hexString = String(bbb);
     String hexString = String(bbb);
+  #ifdef ENABLE_AIS_NB_IOT
+    signal sig = AISnb.getSignal();
     AISnb.sendUDPmsg(serverIP, serverPort, hexString); 
+  #endif
     flag_dirty = false;
   }
   // interval.every_ms(5L * 1000, []() {
@@ -87,7 +97,11 @@ void loop()
   //   //udp = AISnb.sendUDPmsg( serverIP, serverPort, udpDataHEX);
   // });
 
-  // UDPReceive resp = AISnb.waitResponse();
+
+
+  #ifdef ENABLE_AIS_NB_IOT
+   UDPReceive resp = AISnb.waitResponse();
+  #endif
 }
 
 

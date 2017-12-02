@@ -19,9 +19,9 @@ typedef struct __attribute((__packed__)) {
 } CMMC_SENSOR_T; 
 
 typedef struct __attribute((__packed__)) {
-  uint8_t header[2] = {0x7e, 0x7f};
-  uint8_t version = 1;
-  uint8_t project = 1;
+  uint8_t header[2] = {0xfa, 0xfb};
+  uint8_t version = 9;
+  uint8_t project = 8;
   uint8_t reserved[4];
   CMMC_SENSOR_T data;
   uint32_t sleepTime;
@@ -29,3 +29,18 @@ typedef struct __attribute((__packed__)) {
   uint32_t sum;
   uint8_t tail[2] = {0x0d, 0x0a};
 } CMMC_PACKET_T; 
+
+
+typedef struct __attribute((__packed__)) {
+  uint32_t sound;       // Mic 
+  uint32_t Max_Acc; // Mpu9250
+  uint32_t AccX;
+  uint32_t AccY;
+  uint32_t AccZ;
+  uint32_t GyroX;
+  uint32_t GyroY;
+  uint32_t GyroZ;
+  uint32_t MagX;
+  uint32_t MagY;
+  uint32_t MagZ; 
+} CMMC_MASTER_PACKET_T;
