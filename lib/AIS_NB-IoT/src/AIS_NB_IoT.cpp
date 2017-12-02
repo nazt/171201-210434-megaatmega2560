@@ -7,6 +7,7 @@
 */
 
 #include "AIS_NB_IoT.h"
+#include <Arduino.h>
 
 //################### Buffer #######################
 String input;
@@ -21,9 +22,7 @@ bool flag_rcv = true;
 bool en_rcv = false;
 unsigned long previous = 0;
 
-void event_null(char *data) {}
-
-AltSoftSerial myserial;
+void event_null(char *data) {} 
 
 AIS_NB_IoT::AIS_NB_IoT()
 {
@@ -32,8 +31,8 @@ AIS_NB_IoT::AIS_NB_IoT()
 
 void AIS_NB_IoT:: setupDevice(String serverPort)
 {
-  myserial.begin(9600);
-  _Serial = &myserial;
+  Serial1.begin(9600);
+  _Serial = &Serial1;
 
   Serial.println(F("############### AIS_NB-IoT Library by AIS/DEVI V2 ##############"));
   reset();
@@ -471,7 +470,7 @@ UDPSend AIS_NB_IoT:: sendUDPmsg( String addressI, String port, unsigned int len,
       _Serial->print(data[i]);
       if (debug) Serial.print(data[i]);
     }
-    if (send_mode == MODE_STRING)
+    else if (send_mode == MODE_STRING)
     {
       if (data[i] <= 0xF)
       {

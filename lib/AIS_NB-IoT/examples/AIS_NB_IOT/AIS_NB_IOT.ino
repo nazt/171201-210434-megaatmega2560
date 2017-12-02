@@ -10,6 +10,7 @@ AIS_NB_IoT AISnb;
 AIS_NB_IoT_RES resp;
 
 const long interval = 20000;  //millisecond
+
 unsigned long previousMillis = 0;
 
 long cnt = 0;

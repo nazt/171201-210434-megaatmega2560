@@ -94,10 +94,13 @@ void loop()
   if (flag_dirty) {
   #ifdef ENABLE_AIS_NB_IOT
     array_to_string((byte*)&master_packet, sizeof(master_packet), bbb); 
-    // array_to_string((byte*)&(master_packet.packet), sizeof(master_packet.packet), bbb); 
+    // MODE_STRING
     hexString = String(bbb);
+    //AISnb.sendUDPmsg(serverIP, serverPort, sizeof(master_packet), (char*)&master_packet, MODE_STRING);
+    //delay(200);
+    AISnb.sendUDPmsg(serverIP, serverPort, hexString);
     signal sig = AISnb.getSignal();
-    AISnb.sendUDPmsg(serverIP, serverPort, hexString); 
+    // AISnb.sendUDPmsg(hexString); 
   #endif
     flag_dirty = false;
   }

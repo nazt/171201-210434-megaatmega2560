@@ -1,17 +1,12 @@
 #ifndef AIS_NB_IoT_h
 #define AIS_NB_IoT_h
 
-#define ATLSOFTSERIAL 1
-
 #include <Arduino.h>
 #include <Stream.h>
 
 #define MODE_STRING 0
 #define MODE_STRING_HEX 1
 
-#if ATLSOFTSERIAL 
-	#include "AltSoftSerial.h"
-#endif
 
 struct AIS_NB_IoT_RES
 {

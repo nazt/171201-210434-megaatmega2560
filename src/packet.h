@@ -36,19 +36,22 @@ typedef struct __attribute((__packed__)) {
   uint8_t version = 2;
   uint8_t project = 2;
   uint8_t reserved[4]; CMMC_PACKET_T packet;
-  uint32_t temperature;
-  uint32_t humidity;
-  uint32_t sound;   // Mic 
-  uint32_t Max_Acc; // Mpu9250
-  uint32_t AccX;
-  uint32_t AccY;
-  uint32_t AccZ;
-  uint32_t GyroX;
-  uint32_t GyroY;
-  uint32_t GyroZ;
-  uint32_t MagX;
-  uint32_t MagY;
-  uint32_t MagZ; 
+  uint32_t temperature_c;
+  uint32_t humidity_percent_rh;
+  uint32_t sound_avg_db;   // Mic 
+  uint32_t max_acc; // Mpu9250
+  uint32_t acc_x;
+  uint32_t acc_y;
+  uint32_t acc_z;
+  uint32_t gyro_x;
+  uint32_t gyro_y;
+  uint32_t gyro_z;
+  uint32_t mag_x;
+  uint32_t mag_y;
+  uint32_t mag_z; 
+  uint32_t nb_rssi; 
+  uint32_t nb_csq; 
+  uint32_t nb_beq; 
   uint32_t sum;
   uint8_t tail[2] = {0x0d, 0x0a};
 } CMMC_MASTER_PACKET_T;
