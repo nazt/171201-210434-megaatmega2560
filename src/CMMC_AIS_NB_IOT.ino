@@ -38,7 +38,6 @@ void dump(const u8* data, size_t size) {
   // }
 }
 
-//CMMC_PACKET_T cmmc_packet;
 CMMC_MASTER_PACKET_T master_packet;
 
 void setup()
@@ -58,13 +57,6 @@ void setup()
     Serial.println();
     Serial.print("packet size= "); 
     Serial.println(len); 
-    // Serial.print("CMMC PACKET size= "); 
-    // Serial.println(sizeof(cmmc_packet)); 
-    // memcpy(&cmmc_packet, packet, len); 
-    // dump(packet, len); 
-
-
-    // memcpy((uint8_t*)&master_packet.packet, &packet, len); 
 
     Serial.println("MASTER_PACKET..");
     Serial.print("master_packet size= ");
@@ -77,13 +69,6 @@ void setup()
     Serial.println(String("field2 = ")  + master_packet.packet.data.field2);
     Serial.println(String("battery = ") + master_packet.packet.data.battery); 
 
-    // master_packet.packet = cmmc_packet; 
-    // dump((uint8_t*)&master_packet, sizeof(master_packet)); 
-    // for (int ii ; ii < sizeof(master_packet); ii++) { 
-    //   Serial.print( ((uint8_t*) &master_packet)[ii], HEX); 
-    // }
-    // Serial.println(bbb);
-    // delay(100);
     flag_dirty = true;
   });
 } 
@@ -93,7 +78,6 @@ void loop()
 {
   parser.process();
   if (flag_dirty) {
-    sig = AISnb.getSignal();
     master_packet.nb_ber = sig.ber.toInt();
     master_packet.nb_rssi = sig.rssi.toInt();
     master_packet.nb_csq = sig.csq.toInt(); 
@@ -102,27 +86,9 @@ void loop()
     flag_dirty = false;
   }
 
-  // interval.every_ms(5L * 1000, []() {
-  //   signal sig = AISnb.getSignal();
-  //   //    Serial.print("csq: " + sig.csq);
-  //   //    Serial.print("rssi: " + sig.rssi);
-  //   //    Serial.print("ber: " + sig.ber);
-  //   UDPSend udp;
-  //   cnt++;
-  //   // Send data in String
-  //   udp = AISnb.sendUDPmsgStr(serverIP, serverPort, hexString);
-
-  //   //udpDataHEX = AISnb.str2HexStr(udpData);
-
-  //   // Send data in HexString
-  //   //udp = AISnb.sendUDPmsg( serverIP, serverPort, udpDataHEX);
-  // });
-
-
-
-  #ifdef ENABLE_AIS_NB_IOT
-  //  UDPReceive resp = AISnb.waitResponse();
-  #endif
+  interval.every_ms(5L * 1000, []() {
+    sig = AISnb.getSignal();
+  });
 }
 
 
