@@ -88,22 +88,20 @@ void setup()
   });
 } 
 String hexString;
+signal  sig;
 void loop()
 {
   parser.process();
   if (flag_dirty) {
-  #ifdef ENABLE_AIS_NB_IOT
+    sig = AISnb.getSignal();
+    master_packet.nb_ber = sig.ber.toInt();
+    master_packet.nb_rssi = sig.rssi.toInt();
+    master_packet.nb_csq = sig.csq.toInt(); 
     array_to_string((byte*)&master_packet, sizeof(master_packet), bbb); 
-    // MODE_STRING
-    hexString = String(bbb);
-    //AISnb.sendUDPmsg(serverIP, serverPort, sizeof(master_packet), (char*)&master_packet, MODE_STRING);
-    //delay(200);
-    AISnb.sendUDPmsg(serverIP, serverPort, hexString);
-    signal sig = AISnb.getSignal();
-    // AISnb.sendUDPmsg(hexString); 
-  #endif
+    AISnb.sendUDPmsg(serverIP, serverPort, String(bbb));
     flag_dirty = false;
   }
+
   // interval.every_ms(5L * 1000, []() {
   //   signal sig = AISnb.getSignal();
   //   //    Serial.print("csq: " + sig.csq);
