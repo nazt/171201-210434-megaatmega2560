@@ -93,14 +93,14 @@ void setup()
     Serial.println("MASTER_PACKET..");
     Serial.print("master_packet size= ");
     Serial.println(sizeof(master_packet));
-    // memcpy(&(master_packet.packet), packet, len);
+    memcpy(&(master_packet.packet), packet, len);
 
-    // Serial.println(String("project = ") + master_packet.packet.project);
-    // Serial.println(String("version = ") + master_packet.packet.version);
-    // Serial.println(String("field1 = ")  + master_packet.packet.data.field1);
-    // Serial.println(String("field2 = ")  + master_packet.packet.data.field2);
-    // Serial.println(String("battery = ") + master_packet.packet.data.battery);
-    // Serial.println(String("myName= ") + master_packet.packet.data.myName);
+    Serial.println(String("project = ") + master_packet.packet.project);
+    Serial.println(String("version = ") + master_packet.packet.version);
+    Serial.println(String("field1 = ")  + master_packet.packet.data.field1);
+    Serial.println(String("field2 = ")  + master_packet.packet.data.field2);
+    Serial.println(String("battery = ") + master_packet.packet.data.battery);
+    Serial.println(String("myName= ") + master_packet.packet.data.myName);
 
     flag_dirty = true;
   });
