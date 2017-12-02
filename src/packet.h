@@ -52,6 +52,9 @@ typedef struct __attribute((__packed__)) {
   uint32_t nb_rssi; 
   uint32_t nb_csq; 
   uint32_t nb_ber; 
+  float latitude;
+  float logitude;
+  float altitude;
   uint32_t sum;
   uint8_t tail[2] = {0x0d, 0x0a};
 } CMMC_MASTER_PACKET_T;
