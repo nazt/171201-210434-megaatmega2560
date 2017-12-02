@@ -19,13 +19,13 @@ typedef struct __attribute((__packed__)) {
 } CMMC_SENSOR_T; 
 
 typedef struct __attribute((__packed__)) {
-  uint8_t header[2] = {0xfa, 0xfb};
-  uint8_t version = 9;
-  uint8_t project = 8;
+  uint8_t header[2] = {0x7e, 0x7f};
+  uint8_t version = 1;
+  uint8_t project = 1;
   uint8_t reserved[4];
-  CMMC_SENSOR_T data;
   uint32_t sleepTime;
   uint32_t ms;
+  CMMC_SENSOR_T data;
   uint32_t sum;
   uint8_t tail[2] = {0x0d, 0x0a};
 } CMMC_PACKET_T; 
@@ -35,7 +35,7 @@ typedef struct __attribute((__packed__)) {
   uint8_t header[2] = {0xda, 0xdb};
   uint8_t version = 2;
   uint8_t project = 2;
-  uint8_t reserved[4]; CMMC_PACKET_T packet;
+  uint8_t reserved[4]; 
   uint32_t temperature_c;
   uint32_t humidity_percent_rh;
   uint32_t sound_avg_db;   // Mic 
@@ -55,7 +55,8 @@ typedef struct __attribute((__packed__)) {
   int32_t gps_latitude = 0;
   int32_t gps_longitude = 0;
   int32_t gps_altitude_cm = 0;
-  uint32_t gps_us = 0;
+  uint32_t gps_us = 0; 
+  CMMC_PACKET_T packet;
   uint32_t sum;
   uint8_t tail[2] = {0x0d, 0x0a};
 } CMMC_MASTER_PACKET_T;

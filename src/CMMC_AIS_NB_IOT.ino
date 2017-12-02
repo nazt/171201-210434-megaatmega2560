@@ -2,7 +2,7 @@
 #include <AIS_NB_IoT.h>
 #include "CMMC_Interval.hpp"
 
-#define ENABLE_AIS_NB_IOT 1
+// #define ENABLE_AIS_NB_IOT 1
 
 #include <NMEAGPS.h>
 #include <GPSport.h>
@@ -17,7 +17,6 @@ static uint32_t gps_us;
 static void doSomeWork( const gps_fix & fix );
 static void doSomeWork( const gps_fix & fix )
 {
-
   if (fix.valid.location) {
     gps_latitude = fix.latitudeL();
     gps_longitude = fix.longitude();
@@ -73,12 +72,12 @@ void setup()
 {
   Serial.begin(57600);
   Serial.println("Waiting NB-IoT first boot..");
-  delay(5000); // wait nb-iot module boot
-  AISnb.debug = true;
   Serial3.begin(57600);
   gpsPort.begin(9600);
   Serial.println("BEGIN...");
 #ifdef ENABLE_AIS_NB_IOT
+  delay(5000); // wait nb-iot module boot
+  AISnb.debug = true;
   AISnb.setupDevice(serverPort);
   String ip1 = AISnb.getDeviceIP();
   Serial.println("Connected...");
@@ -94,13 +93,14 @@ void setup()
     Serial.println("MASTER_PACKET..");
     Serial.print("master_packet size= ");
     Serial.println(sizeof(master_packet));
-    memcpy(&(master_packet.packet), packet, len);
+    // memcpy(&(master_packet.packet), packet, len);
 
-    Serial.println(String("project = ") + master_packet.packet.project);
-    Serial.println(String("version = ") + master_packet.packet.version);
-    Serial.println(String("field1 = ")  + master_packet.packet.data.field1);
-    Serial.println(String("field2 = ")  + master_packet.packet.data.field2);
-    Serial.println(String("battery = ") + master_packet.packet.data.battery);
+    // Serial.println(String("project = ") + master_packet.packet.project);
+    // Serial.println(String("version = ") + master_packet.packet.version);
+    // Serial.println(String("field1 = ")  + master_packet.packet.data.field1);
+    // Serial.println(String("field2 = ")  + master_packet.packet.data.field2);
+    // Serial.println(String("battery = ") + master_packet.packet.data.battery);
+    // Serial.println(String("myName= ") + master_packet.packet.data.myName);
 
     flag_dirty = true;
   });
@@ -109,18 +109,19 @@ String hexString;
 signal  sig;
 void loop()
 {
-  GPSloop();
   parser.process();
+  GPSloop(); 
   if (flag_dirty) {
-    sig = AISnb.getSignal();
     master_packet.gps_altitude_cm = gps_altitude_cm;
     master_packet.gps_latitude = gps_latitude;
     master_packet.gps_longitude = gps_longitude;
     master_packet.gps_us = gps_us;
+    // array_to_string((byte*)&master_packet, sizeof(master_packet), bbb);
+    #ifdef ENABLE_AIS_NB_IOT
+    sig = AISnb.getSignal();
     master_packet.nb_ber = sig.ber.toInt();
     master_packet.nb_rssi = sig.rssi.toInt();
     master_packet.nb_csq = sig.csq.toInt();
-    array_to_string((byte*)&master_packet, sizeof(master_packet), bbb);
     UDPSend res = AISnb.sendUDPmsg(serverIP, serverPort, String(bbb));
     if (res.status) {
       Serial.println("SEND OK"); 
@@ -128,11 +129,13 @@ void loop()
     else {
       Serial.println("SEND FAILED.");
     }
+    #endif
     flag_dirty = false;
   }
-
   interval.every_ms(5L * 1000, []() { });
-  UDPReceive resp = AISnb.waitResponse();
+  #ifdef ENABLE_AIS_NB_IOT
+   UDPReceive resp = AISnb.waitResponse();
+  #endif
 
 }
 
