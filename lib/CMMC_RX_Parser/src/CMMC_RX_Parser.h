@@ -12,7 +12,7 @@ typedef enum {
 
 
 typedef struct __attribute((__packed__)) {
-	uint8_t  data[100];
+	uint8_t  data[160];
   uint16_t len;
 } CMMC_SERIAL_PACKET_T;
 

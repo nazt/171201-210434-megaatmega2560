@@ -44,6 +44,7 @@ void CMMC_RX_Parser::_parse(uint8_t data) {
             memcpy(&_user_packet, &_packet, sizeof(_packet));
             _user_on_data((u8*)&_user_packet, _len); 
           }
+          _serial->flush();
           this->_len = 0;
           _state = WAIT_STATE;
           break;
