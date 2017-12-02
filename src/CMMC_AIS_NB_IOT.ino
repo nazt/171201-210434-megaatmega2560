@@ -19,20 +19,11 @@ static void doSomeWork( const gps_fix & fix )
 {
 
   if (fix.valid.location) {
-    // if ( fix.dateTime.seconds < 10 )
-    //   Serial.print( '0' );
-    // Serial.print( fix.dateTime.seconds );
-    // Serial.print(" lat: ");
-    // Serial.println(fix.latitudeL());
-    // fix.latitude 
     gps_latitude = fix.latitudeL();
     gps_longitude = fix.longitude();
     gps_altitude_cm = fix.altitude_cm();
     gps_us =  fix.dateTime_us();
-  }
-
-  Serial.println();
-
+  } 
 } // doSomeWork
 static void GPSloop();
 static void GPSloop()
@@ -83,13 +74,14 @@ void setup()
   Serial.begin(57600);
   Serial.println("Waiting NB-IoT first boot..");
   delay(5000); // wait nb-iot module boot
-  AISnb.debug = true;
+  AISnb.debug = false;
   Serial3.begin(57600);
   gpsPort.begin(9600);
   Serial.println("BEGIN...");
 #ifdef ENABLE_AIS_NB_IOT
   AISnb.setupDevice(serverPort);
   String ip1 = AISnb.getDeviceIP();
+  Serial.println("Connected...");
   pingRESP pingR = AISnb.pingIP(serverIP);
 #endif
 
@@ -129,12 +121,19 @@ void loop()
     master_packet.nb_rssi = sig.rssi.toInt();
     master_packet.nb_csq = sig.csq.toInt();
     array_to_string((byte*)&master_packet, sizeof(master_packet), bbb);
-    AISnb.sendUDPmsg(serverIP, serverPort, String(bbb));
+    UDPSend res = AISnb.sendUDPmsg(serverIP, serverPort, String(bbb));
+    if (res.status) {
+      Serial.println("SEND OK"); 
+    }
+    else {
+      Serial.println("SEND FAILED.");
+    }
     flag_dirty = false;
   }
 
-  interval.every_ms(5L * 1000, []() {
-  });
+  interval.every_ms(5L * 1000, []() { });
+  UDPReceive resp = AISnb.waitResponse();
+
 }
 
 
