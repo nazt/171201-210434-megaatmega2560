@@ -9,9 +9,9 @@ AIS_NB_IoT AISnb;
 AIS_NB_IoT_RES resp;
 
 String udpData = "";
-CMMC_Interval interval;
-
+CMMC_Interval interval; 
 #include <CMMC_RX_Parser.h>
+#include "packet.h"
 void array_to_string(byte array[], unsigned int len, char buffer[])
 {
   for (unsigned int i = 0; i < len; i++)
@@ -24,22 +24,18 @@ void array_to_string(byte array[], unsigned int len, char buffer[])
   buffer[len * 2] = '\0';
 }
 String hexString = "";
-// void generateHexString(const u8* data, size_t size) {
-//   for (size_t i = 0; i < size; i++) {
-//     String a = String(data[i], HEX);
-//     if (a.length() == 1) {
-//       hexString +=  "0";
-//       hexString += a;
-//     }
-//   }
-//   Serial.println(hexString);
-// }
-
 long cnt = 0;
 CMMC_RX_Parser parser(&Serial3);
 
 bool flag_dirty = false;
 char bbb[256];
+CMMC_PACKET_T cmmc_packet;
+void dump(const u8* data, size_t size) {
+  for (size_t i = 0; i < size; i++) {
+    Serial.print(data[i], HEX);
+  }
+}
+
 
 void setup()
 {
@@ -50,16 +46,18 @@ void setup()
   AISnb.setupDevice(serverPort);
   String ip1 = AISnb.getDeviceIP();
   pingRESP pingR = AISnb.pingIP(serverIP);
+
   parser.on_command_arrived([](u8* packet, u8 len) {
-    char buffer[256] = {0};
-      // hexString = String(buffer); 
-    // char buf[len+1] = {0};
-    Serial.println("DATA ARRIVED..");
-    *(packet +len+3-1) =  0x0d;
-    *(packet +len+4-1) =  0x0a;
-    array_to_string((byte*)packet, len+4, buffer);
-    strcpy(bbb, buffer);
-    // Serial.println(buffer); 
+    memcpy((uint8_t*)&cmmc_packet, packet, len);
+    Serial.println(String("project = ") + cmmc_packet.project);
+    Serial.println(String("version = ") + cmmc_packet.version);
+    Serial.println(String("field1 = ") + cmmc_packet.data.field1);
+    Serial.println(String("field2 = ") + cmmc_packet.data.field2);
+    Serial.println(String("battery = ") + cmmc_packet.data.battery); 
+    // Serial.print("cmmc_packet size= ");
+    // Serial.println(sizeof(cmmc_packet));
+    // dump((uint8_t*)&cmmc_packet, len); 
+    array_to_string((byte*)packet, len+4, bbb);
     flag_dirty = true;
   });
 }
@@ -69,6 +67,7 @@ void loop()
   if (flag_dirty) {
     signal sig = AISnb.getSignal();
     hexString = String(bbb);
+    String hexString = String(bbb);
     AISnb.sendUDPmsg(serverIP, serverPort, hexString); 
     flag_dirty = false;
   }
@@ -88,7 +87,7 @@ void loop()
   //   //udp = AISnb.sendUDPmsg( serverIP, serverPort, udpDataHEX);
   // });
 
-  UDPReceive resp = AISnb.waitResponse();
+  // UDPReceive resp = AISnb.waitResponse();
 }
 
 
