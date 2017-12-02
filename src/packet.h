@@ -49,7 +49,7 @@ typedef struct __attribute((__packed__)) {
   uint32_t mag_x;
   uint32_t mag_y;
   uint32_t mag_z; 
-  uint32_t nb_rssi; 
+  int32_t nb_rssi; 
   uint32_t nb_csq; 
   uint32_t nb_ber; 
   int32_t gps_latitude = 0;

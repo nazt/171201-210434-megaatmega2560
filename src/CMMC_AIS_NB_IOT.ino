@@ -122,6 +122,9 @@ void loop()
     master_packet.nb_ber = sig.ber.toInt();
     master_packet.nb_rssi = sig.rssi.toInt();
     master_packet.nb_csq = sig.csq.toInt();
+    Serial.println(master_packet.nb_rssi);
+    Serial.println(master_packet.nb_csq);
+    Serial.println(master_packet.nb_ber);
     UDPSend res = AISnb.sendUDPmsg(serverIP, serverPort, String(bbb));
     if (res.status) {
       Serial.println("SEND OK"); 
