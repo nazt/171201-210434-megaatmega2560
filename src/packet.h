@@ -32,7 +32,13 @@ typedef struct __attribute((__packed__)) {
 
 
 typedef struct __attribute((__packed__)) {
-  uint32_t sound;       // Mic 
+  uint8_t header[2] = {0xda, 0xdb};
+  uint8_t version = 2;
+  uint8_t project = 2;
+  uint8_t reserved[4]; CMMC_PACKET_T packet;
+  uint32_t temperature;
+  uint32_t humidity;
+  uint32_t sound;   // Mic 
   uint32_t Max_Acc; // Mpu9250
   uint32_t AccX;
   uint32_t AccY;
@@ -43,4 +49,6 @@ typedef struct __attribute((__packed__)) {
   uint32_t MagX;
   uint32_t MagY;
   uint32_t MagZ; 
+  uint32_t sum;
+  uint8_t tail[2] = {0x0d, 0x0a};
 } CMMC_MASTER_PACKET_T;
