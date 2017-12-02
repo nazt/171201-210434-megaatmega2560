@@ -74,7 +74,7 @@ void setup()
   Serial.begin(57600);
   Serial.println("Waiting NB-IoT first boot..");
   delay(5000); // wait nb-iot module boot
-  AISnb.debug = false;
+  AISnb.debug = true;
   Serial3.begin(57600);
   gpsPort.begin(9600);
   Serial.println("BEGIN...");
