@@ -31,8 +31,8 @@ AIS_NB_IoT::AIS_NB_IoT()
 
 void AIS_NB_IoT:: setupDevice(String serverPort)
 {
-  Serial1.begin(9600);
-  _Serial = &Serial1;
+  Serial2.begin(9600);
+  _Serial = &Serial2;
 
   Serial.println(F("############### AIS_NB-IoT Library by AIS/DEVI V2 ##############"));
   reset();

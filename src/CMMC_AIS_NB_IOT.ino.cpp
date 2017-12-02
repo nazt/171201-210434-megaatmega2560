@@ -1,3 +1,6 @@
+# 1 "/var/folders/ff/__xk2dnn5wx5m8lx4g5m5yvm0000gn/T/tmpWFZEr9"
+#include <Arduino.h>
+# 1 "/Users/nat/Documents/PlatformIO/Projects/171201-210434-megaatmega2560/src/CMMC_AIS_NB_IOT.ino"
 #include <Arduino.h>
 #include <AIS_NB_IoT.h>
 #include "CMMC_Interval.hpp"
@@ -7,7 +10,7 @@
 #include <NMEAGPS.h>
 #include <GPSport.h>
 
-static NMEAGPS  gps; // This parses the GPS characters
+static NMEAGPS gps;
 
 static int32_t gps_latitude = 0;
 static int32_t gps_longitude = 0;
@@ -15,32 +18,39 @@ static int32_t gps_altitude_cm = 0;
 static uint32_t gps_us;
 
 static void doSomeWork( const gps_fix & fix );
+static void doSomeWork( const gps_fix & fix );
+static void GPSloop();
+void array_to_string(byte array[], unsigned int len, char buffer[]);
+void dump(const u8* data, size_t size);
+void setup();
+void loop();
+#line 18 "/Users/nat/Documents/PlatformIO/Projects/171201-210434-megaatmega2560/src/CMMC_AIS_NB_IOT.ino"
 static void doSomeWork( const gps_fix & fix )
 {
 
   if (fix.valid.location) {
-    // if ( fix.dateTime.seconds < 10 )
-    //   Serial.print( '0' );
-    // Serial.print( fix.dateTime.seconds );
-    // Serial.print(" lat: ");
-    // Serial.println(fix.latitudeL());
-    // fix.latitude 
+
+
+
+
+
+
     gps_latitude = fix.latitudeL();
     gps_longitude = fix.longitude();
     gps_altitude_cm = fix.altitude_cm();
-    gps_us =  fix.dateTime_us();
+    gps_us = fix.dateTime_us();
   }
 
   Serial.println();
 
-} // doSomeWork
+}
 static void GPSloop();
 static void GPSloop()
 {
   while (gps.available( gpsPort ))
     doSomeWork( gps.read() );
 
-} // GPSloop
+}
 
 String serverIP = "103.212.181.167";
 String serverPort = "55566";
@@ -57,8 +67,8 @@ void array_to_string(byte array[], unsigned int len, char buffer[])
   {
     byte nib1 = (array[i] >> 4) & 0x0F;
     byte nib2 = (array[i] >> 0) & 0x0F;
-    buffer[i * 2 + 0] = nib1  < 0xA ? '0' + nib1  : 'A' + nib1  - 0xA;
-    buffer[i * 2 + 1] = nib2  < 0xA ? '0' + nib2  : 'A' + nib2  - 0xA;
+    buffer[i * 2 + 0] = nib1 < 0xA ? '0' + nib1 : 'A' + nib1 - 0xA;
+    buffer[i * 2 + 1] = nib2 < 0xA ? '0' + nib2 : 'A' + nib2 - 0xA;
   }
   buffer[len * 2] = '\0';
 }
@@ -69,11 +79,11 @@ bool flag_dirty = false;
 char bbb[400];
 void dump(const u8* data, size_t size) {
   array_to_string((byte*)data, size, bbb);
-  // array_to_string((byte*)packet, len+4, buffer);
-  // Serial.println(bbb);
-  // for (size_t i = 0; i < size; i++) {
-  //   Serial.print(data[i], HEX);
-  // }
+
+
+
+
+
 }
 
 CMMC_MASTER_PACKET_T master_packet;
@@ -104,15 +114,15 @@ void setup()
 
     Serial.println(String("project = ") + master_packet.packet.project);
     Serial.println(String("version = ") + master_packet.packet.version);
-    Serial.println(String("field1 = ")  + master_packet.packet.data.field1);
-    Serial.println(String("field2 = ")  + master_packet.packet.data.field2);
+    Serial.println(String("field1 = ") + master_packet.packet.data.field1);
+    Serial.println(String("field2 = ") + master_packet.packet.data.field2);
     Serial.println(String("battery = ") + master_packet.packet.data.battery);
 
     flag_dirty = true;
   });
 }
 String hexString;
-signal  sig;
+signal sig;
 void loop()
 {
   GPSloop();
@@ -134,6 +144,3 @@ void loop()
     sig = AISnb.getSignal();
   });
 }
-
-
-
