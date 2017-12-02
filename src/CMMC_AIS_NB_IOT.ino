@@ -80,8 +80,10 @@ CMMC_MASTER_PACKET_T master_packet;
 
 void setup()
 {
-  AISnb.debug = true;
   Serial.begin(57600);
+  Serial.println("Waiting NB-IoT first boot..");
+  delay(5000); // wait nb-iot module boot
+  AISnb.debug = true;
   Serial3.begin(57600);
   gpsPort.begin(9600);
   Serial.println("BEGIN...");
@@ -118,6 +120,7 @@ void loop()
   GPSloop();
   parser.process();
   if (flag_dirty) {
+    sig = AISnb.getSignal();
     master_packet.gps_altitude_cm = gps_altitude_cm;
     master_packet.gps_latitude = gps_latitude;
     master_packet.gps_longitude = gps_longitude;
@@ -131,7 +134,6 @@ void loop()
   }
 
   interval.every_ms(5L * 1000, []() {
-    sig = AISnb.getSignal();
   });
 }
 
