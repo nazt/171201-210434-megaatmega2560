@@ -1,6 +1,9 @@
 #include <Arduino.h>
 #include <AIS_NB_IoT.h>
 #include "CMMC_Interval.hpp"
+#include <Wire.h>
+#include <Adafruit_Sensor.h>
+#include <Adafruit_BME680.h>
 
 #define ENABLE_AIS_NB_IOT 1
 
@@ -13,6 +16,8 @@ static int32_t gps_latitude = 0;
 static int32_t gps_longitude = 0;
 static int32_t gps_altitude_cm = 0;
 static uint32_t gps_us;
+static uint32_t bme680_tmp;
+static uint32_t bme680_hum;
 
 static void doSomeWork( const gps_fix & fix );
 static void doSomeWork( const gps_fix & fix )
@@ -35,6 +40,9 @@ String serverIP = "103.212.181.167";
 String serverPort = "55566";
 AIS_NB_IoT AISnb;
 AIS_NB_IoT_RES resp;
+
+Adafruit_BME680 bme; // I2C
+#define SEALEVELPRESSURE_HPA (1013.25)
 
 String udpData = "";
 CMMC_Interval interval;
@@ -87,6 +95,19 @@ void setup()
   Serial.println("Waiting NB-IoT first boot..");
   Serial3.begin(57600);
   gpsPort.begin(9600);
+  Wire.begin();
+
+  if (!bme.begin()) {
+    Serial.println("Could not find a valid BME680 sensor, check wiring!");
+    while (1);
+  }
+  // Set up oversampling and filter initialization
+  bme.setTemperatureOversampling(BME680_OS_8X);
+  bme.setHumidityOversampling(BME680_OS_2X);
+  bme.setPressureOversampling(BME680_OS_4X);
+  bme.setIIRFilterSize(BME680_FILTER_SIZE_3);
+  bme.setGasHeater(320, 150); // 320*C for 150 ms
+
   Serial.println("BEGIN...");
 #ifdef ENABLE_AIS_NB_IOT
   delay(5000); // wait nb-iot module boot
@@ -117,6 +138,8 @@ void loop()
     master_packet.gps_latitude = gps_latitude;
     master_packet.gps_longitude = gps_longitude;
     master_packet.gps_us = gps_us;
+    master_packet.temperature_c = bme680_tmp * 100;
+    master_packet.humidity_percent_rh = bme680_hum * 100;
     master_packet.cnt++;
     array_to_string((byte*)&master_packet, sizeof(master_packet), bbb);
 #ifdef ENABLE_AIS_NB_IOT
@@ -131,13 +154,35 @@ void loop()
     flag_dirty = false;
   }
 
-  interval.every_ms(5L * 1000, []() {
+  interval.every_ms(2L * 1000, []() {
+    if (!bme.performReading()) {
+      Serial.println("Failed to perform reading :(");
+      return;
+    }
+    bme680_tmp = bme.temperature;
+    bme680_hum = bme.humidity;
 
+    Serial.print("Temperature = ");
+    Serial.print(bme.temperature);
+    Serial.println(" *C");
+
+    Serial.print("Pressure = ");
+    Serial.print(bme.pressure / 100.0);
+    Serial.println(" hPa");
+
+    Serial.print("Humidity = ");
+    Serial.print(bme.humidity);
+    Serial.println(" %");
+
+    Serial.print("Gas = ");
+    Serial.print(bme.gas_resistance / 1000.0);
+    Serial.println(" KOhms");
+
+    Serial.print("Approx. Altitude = ");
+    Serial.print(bme.readAltitude(SEALEVELPRESSURE_HPA));
+    Serial.println(" m");
+
+    Serial.println();
 
   });
-
-
 }
-
-
-
