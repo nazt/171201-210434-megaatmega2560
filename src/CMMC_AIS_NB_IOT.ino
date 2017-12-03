@@ -18,6 +18,7 @@ static int32_t gps_altitude_cm = 0;
 static uint32_t gps_us;
 static uint32_t bme680_tmp;
 static uint32_t bme680_hum;
+static uint32_t bme_gas_resistance_ohm;
 
 static void doSomeWork( const gps_fix & fix );
 static void doSomeWork( const gps_fix & fix )
@@ -132,14 +133,14 @@ void loop()
     master_packet.nb_ber = sig.ber.toInt();
     master_packet.nb_rssi = sig.rssi.toInt();
     master_packet.nb_csq = sig.csq.toInt();
-#endif
-
+#endif 
     master_packet.gps_altitude_cm = gps_altitude_cm;
     master_packet.gps_latitude = gps_latitude;
     master_packet.gps_longitude = gps_longitude;
     master_packet.gps_us = gps_us;
-    master_packet.temperature_c = bme680_tmp * 100;
-    master_packet.humidity_percent_rh = bme680_hum * 100;
+    master_packet.temperature_c = bme680_tmp;
+    master_packet.humidity_percent_rh = bme680_hum;
+    master_packet.gas_resistance_ohm =  bme_gas_resistance_ohm;
     master_packet.cnt++;
     array_to_string((byte*)&master_packet, sizeof(master_packet), bbb);
 #ifdef ENABLE_AIS_NB_IOT
@@ -159,30 +160,8 @@ void loop()
       Serial.println("Failed to perform reading :(");
       return;
     }
-    bme680_tmp = bme.temperature;
-    bme680_hum = bme.humidity;
-
-    Serial.print("Temperature = ");
-    Serial.print(bme.temperature);
-    Serial.println(" *C");
-
-    Serial.print("Pressure = ");
-    Serial.print(bme.pressure / 100.0);
-    Serial.println(" hPa");
-
-    Serial.print("Humidity = ");
-    Serial.print(bme.humidity);
-    Serial.println(" %");
-
-    Serial.print("Gas = ");
-    Serial.print(bme.gas_resistance / 1000.0);
-    Serial.println(" KOhms");
-
-    Serial.print("Approx. Altitude = ");
-    Serial.print(bme.readAltitude(SEALEVELPRESSURE_HPA));
-    Serial.println(" m");
-
-    Serial.println();
-
+    bme680_tmp = bme.temperature*100;
+    bme680_hum = bme.humidity*100;
+    bme_gas_resistance_ohm = bme.gas_resistance; 
   });
 }

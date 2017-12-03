@@ -38,6 +38,7 @@ typedef struct __attribute((__packed__)) {
   uint8_t reserved[4];
   uint32_t temperature_c;
   uint32_t humidity_percent_rh;
+  uint32_t gas_resistance_ohm;
   uint32_t sound_avg_db;   // Mic
   uint32_t max_acc; // Mpu9250
   uint32_t acc_x;
@@ -57,6 +58,8 @@ typedef struct __attribute((__packed__)) {
   int32_t gps_altitude_cm = 0;
   uint32_t gps_us = 0;
   uint32_t cnt = 0;
+  uint32_t battery_raw;
+  uint8_t battery_percent;
   CMMC_PACKET_T packet;
   uint32_t sum;
   uint8_t tail[2] = {0x0d, 0x0a};
