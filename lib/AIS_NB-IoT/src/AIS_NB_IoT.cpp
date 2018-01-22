@@ -50,7 +50,9 @@ void AIS_NB_IoT:: setupDevice(String serverPort)
 
 void AIS_NB_IoT:: reset()
 {
+  Serial.println("try reset module");
   rebootModule();
+  Serial.println("reset module completed.");
   while (!setPhoneFunction(1))
   {
     Serial.print(F("."));
@@ -63,7 +65,8 @@ void AIS_NB_IoT:: rebootModule()
   if (debug) {
     Serial.println(F("rebootModule:: delay(2000)"));
   }
-  delay(2000);
+
+  Serial.println("send at..");
 
   _Serial->println(F("AT"));
   AIS_NB_IoT_RES res = wait_rx_bc(500, F("OK"));
@@ -77,11 +80,13 @@ void AIS_NB_IoT:: rebootModule()
   if (debug) {
     Serial.println(F("waitReady:: delay(1000)"));
   }
-  delay(1000);
 }
 
 bool AIS_NB_IoT:: waitReady()
 {
+  if (millis()%1000 == 0) { 
+    Serial.println("wait ready");
+  }
   static bool reset_state = false;
   if (_Serial->available())
   {
@@ -99,14 +104,12 @@ bool AIS_NB_IoT:: setPhoneFunction(unsigned char mode)
   if (debug) {
     Serial.println(F("setPhoneFunction:: delay(1000)"));
   }
-  delay(1000);
   _Serial->print(F("AT+CFUN="));
   _Serial->println(mode);
   AIS_NB_IoT_RES res = wait_rx_bc(1000, F("OK"));
   if (debug) {
-    Serial.println(F("setPhoneFunction-WAIT-RX-BC:: delay(2000)"));
+    Serial.println(F("setPhoneFunction-WAIT-RX-BC"));
   }
-  delay(2000);
   return (res.status);
 }
 
@@ -301,7 +304,7 @@ bool AIS_NB_IoT:: attachNB(String serverPort)
       if (debug) {
         Serial.println(F("attachNB:: delay(3000)"));
       }
-      delay(3000);
+      delay(500);
       if (getNBConnect()) {
         ret = true;
         break;

@@ -110,8 +110,7 @@ void setup()
 
   Serial.println("BEGIN...");
 #ifdef ENABLE_AIS_NB_IOT
-  delay(5000); // wait nb-iot module boot
-  // AISnb.debug = true;
+  AISnb.debug = true;
   AISnb.setupDevice(serverPort);
   String ip1 = AISnb.getDeviceIP();
   Serial.println("Connected...");

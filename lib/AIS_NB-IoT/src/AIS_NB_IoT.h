@@ -50,7 +50,7 @@ class AIS_NB_IoT
 {
 public:
 	AIS_NB_IoT();
-	bool debug;
+	bool debug = true;
 
 	void (*Event_debug)(char *data);
 	void reset();
