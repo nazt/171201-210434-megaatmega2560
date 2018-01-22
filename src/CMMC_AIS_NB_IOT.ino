@@ -37,7 +37,7 @@ static void GPSloop()
     doSomeWork( gps.read() );
 } // GPSloop
 
-String serverIP = "103.212.181.167";
+String serverIP = "128.199.71.82";
 String serverPort = "55566";
 AIS_NB_IoT AISnb;
 AIS_NB_IoT_RES resp;
